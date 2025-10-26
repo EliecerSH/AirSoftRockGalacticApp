@@ -36,13 +36,16 @@ fun CartScreen(navController: NavController) {
     val cartDbHelper = CartDbHelper(context)
     val productDbHelper = ProductDbHelper(context)
     var cartItems by remember { mutableStateOf<List<CartItem>>(emptyList()) }
-    var totalPrice by remember { mutableDoubleStateOf(0.0) }
+    var subtotal by remember { mutableDoubleStateOf(0.0) }
+    val iva = subtotal * 0.19
+    val total = subtotal + iva
 
     // Function to load cart items
+    @SuppressLint("Range")
     fun loadCartItems() {
         val items = mutableListOf<CartItem>()
         val cursor = cartDbHelper.getCartItems()
-        var newTotalPrice = 0.0
+        var newSubtotal = 0.0
         with(cursor) {
             while (moveToNext()) {
                 val productId = getLong(getColumnIndex(CartContract.CartEntry.COLUMN_NAME_PRODUCT_ID))
@@ -70,7 +73,7 @@ fun CartScreen(navController: NavController) {
                             desc = getString(getColumnIndexOrThrow(ProductContract.ProductEntry.COLUMN_NAME_DESC))
                         )
                         items.add(CartItem(product, quantity))
-                        newTotalPrice += product.precio * quantity
+                        newSubtotal += product.precio * quantity
                     }
                     close()
                 }
@@ -78,7 +81,7 @@ fun CartScreen(navController: NavController) {
             close()
         }
         cartItems = items
-        totalPrice = newTotalPrice
+        subtotal = newSubtotal
     }
 
     // Load cart items initially and whenever the screen is shown
@@ -99,7 +102,10 @@ fun CartScreen(navController: NavController) {
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
-            Text("Total: ${NumberFormat.getCurrencyInstance(Locale("es", "CL")).format(totalPrice)}", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+            val currencyFormat = NumberFormat.getCurrencyInstance(Locale("es", "CL"))
+            Text("Subtotal: ${currencyFormat.format(subtotal)}", style = MaterialTheme.typography.bodyLarge)
+            Text("IVA (19%): ${currencyFormat.format(iva)}", style = MaterialTheme.typography.bodyLarge)
+            Text("Total: ${currencyFormat.format(total)}", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(16.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                 Button(onClick = { 
@@ -108,7 +114,7 @@ fun CartScreen(navController: NavController) {
                 }) {
                     Text("Vaciar Carrito")
                 }
-                Button(onClick = { navController.navigate("payment") }) {
+                Button(onClick = { navController.navigate("payment/$total") }) {
                     Text("Proceder al Pago")
                 }
             }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
@@ -22,10 +23,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
@@ -74,19 +77,36 @@ fun HomeScreen(email: String?, navController: NavController) {
         drawerState = drawerState,
         drawerContent = { 
              ModalDrawerSheet {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Bienvenido, $userName", style = MaterialTheme.typography.titleLarge)
+                Column(Modifier.fillMaxHeight()) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Bienvenido, $userName", style = MaterialTheme.typography.titleLarge)
+                    }
+                    Divider()
+                    NavigationDrawerItem(label = { Text("Armas") }, selected = false, onClick = { 
+                        scope.launch { drawerState.close() } 
+                        bottomNavController.navigate("weapons")
+                    })
+                    NavigationDrawerItem(label = { Text("Vestimentas") }, selected = false, onClick = { scope.launch { drawerState.close() } })
+                    NavigationDrawerItem(label = { Text("Munición") }, selected = false, onClick = { scope.launch { drawerState.close() } })
+                    Divider()
+                    NavigationDrawerItem(label = { Text("Contacto") }, selected = false, onClick = { scope.launch { drawerState.close() } })
+                    NavigationDrawerItem(label = { Text("Nosotros") }, selected = false, onClick = { scope.launch { drawerState.close() } })
+
+                    Spacer(Modifier.weight(1f))
+
+                    Divider()
+                    NavigationDrawerItem(
+                        icon = { Icon(Icons.Default.ExitToApp, contentDescription = "Cerrar Sesión") },
+                        label = { Text("Cerrar Sesión") }, 
+                        selected = false, 
+                        onClick = { 
+                            scope.launch { drawerState.close() }
+                            navController.navigate("login") {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }
+                    )
                 }
-                Divider()
-                NavigationDrawerItem(label = { Text("Armas") }, selected = false, onClick = { 
-                    scope.launch { drawerState.close() } 
-                    bottomNavController.navigate("weapons")
-                })
-                NavigationDrawerItem(label = { Text("Vestimentas") }, selected = false, onClick = { scope.launch { drawerState.close() } })
-                NavigationDrawerItem(label = { Text("Munición") }, selected = false, onClick = { scope.launch { drawerState.close() } })
-                Divider()
-                NavigationDrawerItem(label = { Text("Contacto") }, selected = false, onClick = { scope.launch { drawerState.close() } })
-                NavigationDrawerItem(label = { Text("Nosotros") }, selected = false, onClick = { scope.launch { drawerState.close() } })
             }
          }
     ) {
@@ -130,8 +150,17 @@ fun HomeScreen(email: String?, navController: NavController) {
                 composable("showcase") { ShowcaseScreen() }
                 composable("weapons") { WeaponsScreen(navController = bottomNavController) }
                 composable("cart") { CartScreen(navController = bottomNavController) }
-                composable("account") { AccountScreen() }
-                composable("payment") { PaymentScreen() }
+                composable("account") { AccountScreen(email = email) } // Pass email to AccountScreen
+                composable(
+                    "payment/{totalAmount}",
+                    arguments = listOf(navArgument("totalAmount") { type = androidx.navigation.NavType.FloatType })
+                ) { backStackEntry ->
+                    PaymentScreen(
+                        navController = bottomNavController,
+                        totalAmount = backStackEntry.arguments?.getFloat("totalAmount")?.toDouble(),
+                        userEmail = email // Pass email to PaymentScreen
+                    )
+                }
             }
         }
     }
@@ -187,7 +216,10 @@ fun ProductCard(product: Product, navController: NavController, modifier: Modifi
                 }) {
                     Text("Agregar al carrito")
                 }
-                Button(onClick = { navController.navigate("payment") }) {
+                Button(onClick = { 
+                    cartDbHelper.addProductToCart(product.id)
+                    navController.navigate("cart") 
+                }) {
                     Text("Comprar")
                 }
             }
