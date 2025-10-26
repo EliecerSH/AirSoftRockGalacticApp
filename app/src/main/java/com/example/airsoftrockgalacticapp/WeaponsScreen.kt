@@ -1,7 +1,9 @@
 package com.example.airsoftrockgalacticapp
 
 import android.provider.BaseColumns
+import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -24,11 +27,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import java.text.NumberFormat
 import java.util.Locale
 
 @Composable
-fun WeaponsScreen() {
+fun WeaponsScreen(navController: NavController) {
     val context = LocalContext.current
     val dbHelper = ProductDbHelper(context)
     var productList by remember { mutableStateOf<List<Product>>(emptyList()) }
@@ -74,7 +78,7 @@ fun WeaponsScreen() {
         Spacer(modifier = Modifier.height(16.dp))
         LazyColumn {
             items(filteredList) { product ->
-                ProductCard(product)
+                ProductCard(product, navController = navController)
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
