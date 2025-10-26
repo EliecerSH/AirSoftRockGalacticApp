@@ -2,6 +2,7 @@ package com.example.airsoftrockgalacticapp
 
 import android.annotation.SuppressLint
 import android.provider.BaseColumns
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -71,8 +72,8 @@ fun HomeScreen(email: String?, navController: NavController) {
 
     ModalNavigationDrawer(
         drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet {
+        drawerContent = { 
+             ModalDrawerSheet {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Bienvenido, $userName", style = MaterialTheme.typography.titleLarge)
                 }
@@ -87,7 +88,7 @@ fun HomeScreen(email: String?, navController: NavController) {
                 NavigationDrawerItem(label = { Text("Contacto") }, selected = false, onClick = { scope.launch { drawerState.close() } })
                 NavigationDrawerItem(label = { Text("Nosotros") }, selected = false, onClick = { scope.launch { drawerState.close() } })
             }
-        }
+         }
     ) {
         Scaffold(
             topBar = {
@@ -127,9 +128,10 @@ fun HomeScreen(email: String?, navController: NavController) {
         ) { innerPadding ->
             NavHost(navController = bottomNavController, startDestination = "showcase", modifier = Modifier.padding(innerPadding)) {
                 composable("showcase") { ShowcaseScreen() }
-                composable("weapons") { WeaponsScreen() }
-                composable("cart") { CartScreen() }
+                composable("weapons") { WeaponsScreen(navController = bottomNavController) }
+                composable("cart") { CartScreen(navController = bottomNavController) }
                 composable("account") { AccountScreen() }
+                composable("payment") { PaymentScreen() }
             }
         }
     }
@@ -151,32 +153,44 @@ fun ShowcaseScreen() {
 }
 
 @Composable
-fun ProductCard(product: Product, modifier: Modifier = Modifier) {
+fun ProductCard(product: Product, navController: NavController, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val imageResId = context.resources.getIdentifier(product.img, "drawable", context.packageName)
     val formattedPrice = NumberFormat.getCurrencyInstance(Locale("es", "CL")).format(product.precio)
+    val cartDbHelper = CartDbHelper(context)
 
     Card(modifier = modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (imageResId != 0) {
-                Image(
-                    painter = painterResource(id = imageResId),
-                    contentDescription = product.nombre,
-                    modifier = Modifier
-                        .size(100.dp)
-                        .padding(end = 16.dp),
-                    contentScale = ContentScale.Crop
-                )
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                 if (imageResId != 0) {
+                    Image(
+                        painter = painterResource(id = imageResId),
+                        contentDescription = product.nombre,
+                        modifier = Modifier
+                            .size(100.dp)
+                            .padding(end = 16.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(product.nombre, style = MaterialTheme.typography.titleMedium)
+                    Text(product.desc, style = MaterialTheme.typography.bodySmall)
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(formattedPrice, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
             }
-            Column(modifier = Modifier.weight(1f)) {
-                Text(product.nombre, style = MaterialTheme.typography.titleMedium)
-                Text(product.desc, style = MaterialTheme.typography.bodySmall)
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                Button(onClick = { 
+                    cartDbHelper.addProductToCart(product.id)
+                    Toast.makeText(context, "${product.nombre} agregado al carrito", Toast.LENGTH_SHORT).show()
+                }) {
+                    Text("Agregar al carrito")
+                }
+                Button(onClick = { navController.navigate("payment") }) {
+                    Text("Comprar")
+                }
             }
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(formattedPrice, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
         }
     }
 }
