@@ -14,11 +14,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,17 +25,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
 
-data class Payment(
-    val id: Long, 
-    val totalAmount: Double, 
-    val date: String, 
-    val name: String, 
-    val address: String, 
-    val cardNumber: String
-)
+data class Payment(val id: Long, val totalAmount: Double, val date: String, val name: String, val address: String, val cardNumber: String)
 
 @SuppressLint("Range")
 @Composable
@@ -47,6 +37,9 @@ fun AccountScreen(email: String?) {
     val context = LocalContext.current
     val userDbHelper = UserDbHelper(context)
     val paymentDbHelper = PaymentDbHelper(context)
+    val themeDataStore = remember { ThemeDataStore(context) }
+    val isDarkMode by themeDataStore.isDarkMode.collectAsState(initial = false)
+    val scope = rememberCoroutineScope()
 
     var name by remember { mutableStateOf("") }
     var alias by remember { mutableStateOf("") }
@@ -73,7 +66,6 @@ fun AccountScreen(email: String?) {
 
     LaunchedEffect(email) {
         if (email != null) {
-            // --- Get User Data ---
             val userDb = userDbHelper.readableDatabase
             val userCursor = userDb.query(UserContract.UserEntry.TABLE_NAME, arrayOf(UserContract.UserEntry.COLUMN_NAME_NAME, UserContract.UserEntry.COLUMN_NAME_ALIAS, UserContract.UserEntry.COLUMN_NAME_AVATAR_URI), "${UserContract.UserEntry.COLUMN_NAME_EMAIL} = ?", arrayOf(email), null, null, null)
             with(userCursor) {
@@ -88,7 +80,6 @@ fun AccountScreen(email: String?) {
                 close()
             }
 
-            // --- Get Payment History ---
             val paymentDb = paymentDbHelper.readableDatabase
             val paymentCursor = paymentDb.query(PaymentContract.PaymentEntry.TABLE_NAME, null, "${PaymentContract.PaymentEntry.COLUMN_NAME_USER_EMAIL} = ?", arrayOf(email), null, null, "${BaseColumns._ID} DESC")
             val paymentList = mutableListOf<Payment>()
@@ -143,6 +134,23 @@ fun AccountScreen(email: String?) {
                     Button(onClick = { updateUserAlias() }, modifier = Modifier.padding(top = 8.dp)) {
                         Text("Guardar Alias")
                     }
+                }
+            }
+        }
+
+        // --- Theme Switcher ---
+        item {
+            Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
+                Row(
+                    modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Modo Oscuro", style = MaterialTheme.typography.bodyLarge)
+                    Switch(
+                        checked = isDarkMode,
+                        onCheckedChange = { scope.launch { themeDataStore.setDarkMode(it) } }
+                    )
                 }
             }
         }
