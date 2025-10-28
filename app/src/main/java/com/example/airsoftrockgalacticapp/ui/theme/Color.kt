@@ -2,7 +2,7 @@ package com.example.airsoftrockgalacticapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFF4D00FF)
+val Purple80 = Color(0xFF4106D7)
 val PurpleGrey80 = Color(0xFFFFFFFF)
 val Pink80 = Color(0xFFEFB8C8)
 
