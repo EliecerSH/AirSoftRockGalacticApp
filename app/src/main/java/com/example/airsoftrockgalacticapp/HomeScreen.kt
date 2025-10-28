@@ -75,85 +75,109 @@ fun HomeScreen(email: String?, navController: NavController) {
 
     ModalNavigationDrawer(
         drawerState = drawerState,
-        drawerContent = { 
-             ModalDrawerSheet {
-                Column(Modifier.fillMaxHeight()) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Bienvenido, $userName", style = MaterialTheme.typography.titleLarge)
-                    }
-                    Divider()
-                    NavigationDrawerItem(label = { Text("Armas") }, selected = false, onClick = { 
-                        scope.launch { drawerState.close() } 
-                        bottomNavController.navigate("weapons")
-                    })
-                    NavigationDrawerItem(label = { Text("Vestimentas") }, selected = false, onClick = { scope.launch { drawerState.close() } })
-                    NavigationDrawerItem(label = { Text("Munición") }, selected = false, onClick = { scope.launch { drawerState.close() } })
-                    Divider()
-                    NavigationDrawerItem(label = { Text("Contacto") }, selected = false, onClick = { scope.launch { drawerState.close() } })
-                    NavigationDrawerItem(label = { Text("Nosotros") }, selected = false, onClick = { scope.launch { drawerState.close() } })
-
-                    Spacer(Modifier.weight(1f))
-
-                    Divider()
-                    NavigationDrawerItem(
-                        icon = { Icon(Icons.Default.ExitToApp, contentDescription = "Cerrar Sesión") },
-                        label = { Text("Cerrar Sesión") }, 
-                        selected = false, 
-                        onClick = { 
-                            scope.launch { drawerState.close() }
-                            navController.navigate("login") {
-                                popUpTo(0) { inclusive = true }
-                            }
-                        }
-                    )
+        drawerContent = {
+            ModalDrawerSheet(
+                modifier = Modifier.fillMaxHeight(),
+                drawerContainerColor = MaterialTheme.colorScheme.background
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Bienvenido, $userName", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
                 }
+                HorizontalDivider()
+                NavigationDrawerItem(label = { Text("Armas") }, selected = false, onClick = {
+                    scope.launch { drawerState.close() }
+                    bottomNavController.navigate("weapons")
+                })
+                NavigationDrawerItem(label = { Text("Vestimentas") }, selected = false, onClick = { scope.launch { drawerState.close() } })
+                NavigationDrawerItem(label = { Text("Munición") }, selected = false, onClick = { scope.launch { drawerState.close() } })
+                HorizontalDivider()
+                NavigationDrawerItem(label = { Text("Contacto") }, selected = false, onClick = { scope.launch { drawerState.close() } })
+                NavigationDrawerItem(label = { Text("Nosotros") }, selected = false, onClick = { scope.launch { drawerState.close() } })
+
+                Spacer(Modifier.weight(1f))
+
+                HorizontalDivider()
+                NavigationDrawerItem(
+                    icon = { Icon(Icons.Default.ExitToApp, contentDescription = "Cerrar Sesión") },
+                    label = { Text("Cerrar Sesión") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        navController.navigate("login") {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                )
             }
-         }
+        }
     ) {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("AirSoft Rock Galactic") },
+                    title = { Text("AirSoft Rock Galactic", color = MaterialTheme.colorScheme.onBackground) },
                     navigationIcon = {
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Menu")
+                            Icon(Icons.Default.Menu, contentDescription = "Menu", tint = MaterialTheme.colorScheme.onBackground)
                         }
-                    }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background
+                    )
                 )
             },
             bottomBar = {
                 val navBackStackEntry by bottomNavController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
-                NavigationBar {
+                NavigationBar(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                ) {
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
                         label = { Text("Home") },
                         selected = currentRoute == "showcase",
-                        onClick = { bottomNavController.navigate("showcase") }
+                        onClick = { bottomNavController.navigate("showcase") },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                            indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                        )
                     )
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Cart") },
                         label = { Text("Carrito") },
                         selected = currentRoute == "cart",
-                        onClick = { bottomNavController.navigate("cart") }
+                        onClick = { bottomNavController.navigate("cart") },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                            indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                        )
                     )
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.Person, contentDescription = "Account") },
                         label = { Text("Cuenta") },
                         selected = currentRoute == "account",
-                        onClick = { bottomNavController.navigate("account") }
+                        onClick = { bottomNavController.navigate("account") },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                            indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                        )
                     )
                 }
             }
         ) { innerPadding ->
-            NavHost(navController = bottomNavController, startDestination = "showcase", modifier = Modifier.padding(innerPadding)) {
+            NavHost(
+                navController = bottomNavController, startDestination = "showcase", modifier = Modifier.padding(innerPadding)
+            ) {
                 composable("showcase") { ShowcaseScreen() }
                 composable("weapons") { WeaponsScreen(navController = bottomNavController) }
                 composable("cart") { CartScreen(navController = bottomNavController) }
                 composable("account") { AccountScreen(email = email) } // Pass email to AccountScreen
                 composable(
                     "payment/{totalAmount}",
-                    arguments = listOf(navArgument("totalAmount") { type = androidx.navigation.NavType.FloatType })
+                    arguments = listOf(navArgument("totalAmount") { type = NavType.FloatType })
                 ) { backStackEntry ->
                     PaymentScreen(
                         navController = bottomNavController,
@@ -191,7 +215,7 @@ fun ProductCard(product: Product, navController: NavController, modifier: Modifi
     Card(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                 if (imageResId != 0) {
+                if (imageResId != 0) {
                     Image(
                         painter = painterResource(id = imageResId),
                         contentDescription = product.nombre,
@@ -210,15 +234,15 @@ fun ProductCard(product: Product, navController: NavController, modifier: Modifi
             }
             Spacer(modifier = Modifier.height(16.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                Button(onClick = { 
+                Button(onClick = {
                     cartDbHelper.addProductToCart(product.id)
                     Toast.makeText(context, "${product.nombre} agregado al carrito", Toast.LENGTH_SHORT).show()
                 }) {
                     Text("Agregar al carrito")
                 }
-                Button(onClick = { 
+                Button(onClick = {
                     cartDbHelper.addProductToCart(product.id)
-                    navController.navigate("cart") 
+                    navController.navigate("cart")
                 }) {
                     Text("Comprar")
                 }
