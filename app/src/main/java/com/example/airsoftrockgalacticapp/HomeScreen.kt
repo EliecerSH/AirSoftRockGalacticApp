@@ -44,6 +44,49 @@ data class Product(
     val desc: String
 )
 
+val sampleProducts = listOf(
+    Product(
+        id = 1,
+        slug = "mp7-a1",
+        nombre = "MP7-A1",
+        precio = 349990.0,
+        img = "mp7_a1",
+        cantidad = 1,
+        tipo = "subfusil",
+        desc = "Réplica de subfusil MP7-A1 eléctrica, ideal para CQB."
+    ),
+    Product(
+        id = 2,
+        slug = "cm16-raider",
+        nombre = "CM16 Raider",
+        precio = 249990.0,
+        img = "cm16_raider",
+        cantidad = 1,
+        tipo = "fusil",
+        desc = "Fusil de asalto CM16 Raider, versátil y fiable."
+    ),
+    Product(
+        id = 3,
+        slug = "m9-gbb",
+        nombre = "M9 GBB",
+        precio = 179990.0,
+        img = "m9_gbb",
+        cantidad = 1,
+        tipo = "pistola",
+        desc = "Pistola M9 con sistema Gas Blowback para mayor realismo."
+    ),
+    Product(
+        id = 4,
+        slug = "chaleco-tactico",
+        nombre = "Chaleco Táctico",
+        precio = 89990.0,
+        img = "chaleco_tactico",
+        cantidad = 1,
+        tipo = "equipamiento",
+        desc = "Chaleco táctico con sistema MOLLE para personalización."
+    )
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(email: String?, navController: NavController) {
@@ -75,31 +118,40 @@ fun HomeScreen(email: String?, navController: NavController) {
 
     ModalNavigationDrawer(
         drawerState = drawerState,
-        drawerContent = { 
-             ModalDrawerSheet {
-                Column(Modifier.fillMaxHeight()) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Bienvenido, $userName", style = MaterialTheme.typography.titleLarge)
-                    }
-                    Divider()
-                    NavigationDrawerItem(label = { Text("Armas") }, selected = false, onClick = { 
-                        scope.launch { drawerState.close() } 
-                        bottomNavController.navigate("weapons")
-                    })
-                    NavigationDrawerItem(label = { Text("Vestimentas") }, selected = false, onClick = { scope.launch { drawerState.close() } })
-                    NavigationDrawerItem(label = { Text("Munición") }, selected = false, onClick = { scope.launch { drawerState.close() } })
-                    Divider()
-                    NavigationDrawerItem(label = { Text("Contacto") }, selected = false, onClick = { scope.launch { drawerState.close() } })
-                    NavigationDrawerItem(label = { Text("Nosotros") }, selected = false, onClick = { scope.launch { drawerState.close() } })
-
-                    Spacer(Modifier.weight(1f))
-
+        drawerContent = {
+            ModalDrawerSheet {
+                Column(Modifier.fillMaxHeight().padding(8.dp)) {
+                    Text(
+                        "👋 Hola, $userName",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(16.dp)
+                    )
                     Divider()
                     NavigationDrawerItem(
-                        icon = { Icon(Icons.Default.ExitToApp, contentDescription = "Cerrar Sesión") },
-                        label = { Text("Cerrar Sesión") }, 
-                        selected = false, 
-                        onClick = { 
+                        icon = { Icon(Icons.Default.Home, null) },
+                        label = { Text("Inicio") },
+                        selected = false,
+                        onClick = { scope.launch { drawerState.close() } }
+                    )
+                    NavigationDrawerItem(
+                        icon = { Icon(Icons.Default.ShoppingCart, null) },
+                        label = { Text("Carrito") },
+                        selected = false,
+                        onClick = { bottomNavController.navigate("cart") }
+                    )
+                    NavigationDrawerItem(
+                        icon = { Icon(Icons.Default.Person, null) },
+                        label = { Text("Cuenta") },
+                        selected = false,
+                        onClick = { bottomNavController.navigate("account") }
+                    )
+                    Spacer(Modifier.weight(1f))
+                    Divider()
+                    NavigationDrawerItem(
+                        icon = { Icon(Icons.Default.ExitToApp, null) },
+                        label = { Text("Cerrar Sesión") },
+                        selected = false,
+                        onClick = {
                             scope.launch { drawerState.close() }
                             navController.navigate("login") {
                                 popUpTo(0) { inclusive = true }
@@ -108,17 +160,26 @@ fun HomeScreen(email: String?, navController: NavController) {
                     )
                 }
             }
-         }
+        }
     ) {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("AirSoft Rock Galactic") },
+                    title = {
+                        Text(
+                            "AirSoft Rock Galactic",
+                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                        )
+                    },
                     navigationIcon = {
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Menu")
+                            Icon(Icons.Default.Menu, contentDescription = "Menú")
                         }
-                    }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
                 )
             },
             bottomBar = {
@@ -126,19 +187,19 @@ fun HomeScreen(email: String?, navController: NavController) {
                 val currentRoute = navBackStackEntry?.destination?.route
                 NavigationBar {
                     NavigationBarItem(
-                        icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-                        label = { Text("Home") },
+                        icon = { Icon(Icons.Default.Home, null) },
+                        label = { Text("Inicio") },
                         selected = currentRoute == "showcase",
                         onClick = { bottomNavController.navigate("showcase") }
                     )
                     NavigationBarItem(
-                        icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Cart") },
+                        icon = { Icon(Icons.Default.ShoppingCart, null) },
                         label = { Text("Carrito") },
                         selected = currentRoute == "cart",
                         onClick = { bottomNavController.navigate("cart") }
                     )
                     NavigationBarItem(
-                        icon = { Icon(Icons.Default.Person, contentDescription = "Account") },
+                        icon = { Icon(Icons.Default.Person, null) },
                         label = { Text("Cuenta") },
                         selected = currentRoute == "account",
                         onClick = { bottomNavController.navigate("account") }
@@ -146,80 +207,83 @@ fun HomeScreen(email: String?, navController: NavController) {
                 }
             }
         ) { innerPadding ->
-            NavHost(navController = bottomNavController, startDestination = "showcase", modifier = Modifier.padding(innerPadding)) {
-                composable("showcase") { ShowcaseScreen() }
-                composable("weapons") { WeaponsScreen(navController = bottomNavController) }
+            NavHost(
+                navController = bottomNavController,
+                startDestination = "showcase",
+                modifier = Modifier.padding(innerPadding)
+            ) {
+                composable("showcase") { ModernShowcaseScreen() }
                 composable("cart") { CartScreen(navController = bottomNavController) }
-                composable("account") { AccountScreen(email = email) } // Pass email to AccountScreen
-                composable(
-                    "payment/{totalAmount}",
-                    arguments = listOf(navArgument("totalAmount") { type = androidx.navigation.NavType.FloatType })
-                ) { backStackEntry ->
-                    PaymentScreen(
-                        navController = bottomNavController,
-                        totalAmount = backStackEntry.arguments?.getFloat("totalAmount")?.toDouble(),
-                        userEmail = email // Pass email to PaymentScreen
-                    )
-                }
+                composable("account") { AccountScreen(email = email) }
             }
         }
     }
 }
 
 @Composable
-fun ShowcaseScreen() {
-    Column(
+fun ModernShowcaseScreen() {
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(16.dp)
     ) {
-        Text("Bienvenido a AirSoft Rock Galactic", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
-        Text("Explora nuestras categorías en el menú lateral.")
+        item {
+            Text(
+                "⚙️ Bienvenido a AirSoft Rock Galactic",
+                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
+            )
+            Spacer(Modifier.height(12.dp))
+            Text(
+                "Explora nuestras armas, equipamiento y accesorios de calidad profesional.",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(Modifier.height(24.dp))
+        }
+
+        // Ejemplo de productos destacados
+        items(sampleProducts) { product ->
+            ProductCardModern(product = product)
+            Spacer(Modifier.height(12.dp))
+        }
     }
 }
 
 @Composable
-fun ProductCard(product: Product, navController: NavController, modifier: Modifier = Modifier) {
+fun ProductCardModern(product: Product) {
     val context = LocalContext.current
     val imageResId = context.resources.getIdentifier(product.img, "drawable", context.packageName)
     val formattedPrice = NumberFormat.getCurrencyInstance(Locale("es", "CL")).format(product.precio)
-    val cartDbHelper = CartDbHelper(context)
 
-    Card(modifier = modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                 if (imageResId != 0) {
-                    Image(
-                        painter = painterResource(id = imageResId),
-                        contentDescription = product.nombre,
-                        modifier = Modifier
-                            .size(100.dp)
-                            .padding(end = 16.dp),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(product.nombre, style = MaterialTheme.typography.titleMedium)
-                    Text(product.desc, style = MaterialTheme.typography.bodySmall)
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(formattedPrice, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            if (imageResId != 0) {
+                Image(
+                    painter = painterResource(id = imageResId),
+                    contentDescription = product.nombre,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .padding(bottom = 8.dp),
+                    contentScale = ContentScale.Crop
+                )
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                Button(onClick = { 
-                    cartDbHelper.addProductToCart(product.id)
+            Text(product.nombre, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(product.desc, style = MaterialTheme.typography.bodySmall)
+            Spacer(Modifier.height(8.dp))
+            Text(formattedPrice, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+            Spacer(Modifier.height(8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = {
                     Toast.makeText(context, "${product.nombre} agregado al carrito", Toast.LENGTH_SHORT).show()
                 }) {
-                    Text("Agregar al carrito")
+                    Text("Agregar")
                 }
-                Button(onClick = { 
-                    cartDbHelper.addProductToCart(product.id)
-                    navController.navigate("cart") 
-                }) {
+                OutlinedButton(onClick = { /* Comprar acción */ }) {
                     Text("Comprar")
                 }
             }

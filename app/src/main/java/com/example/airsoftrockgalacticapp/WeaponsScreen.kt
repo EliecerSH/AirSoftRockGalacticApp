@@ -12,12 +12,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -80,6 +82,50 @@ fun WeaponsScreen(navController: NavController) {
             items(filteredList) { product ->
                 ProductCard(product, navController = navController)
                 Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProductCard(product: Product, navController: NavController) {
+    val context = LocalContext.current
+    Card(
+        onClick = { navController.navigate("productDetail/${product.slug}") },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            val imageResId = context.resources.getIdentifier(product.img, "drawable", context.packageName)
+            Image(
+                painter = painterResource(id = if (imageResId != 0) imageResId else R.drawable.ic_launcher_background), // Fallback image
+                contentDescription = product.nombre,
+                modifier = Modifier.size(100.dp),
+                contentScale = ContentScale.Fit
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = product.nombre,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                val format = NumberFormat.getCurrencyInstance(Locale("es", "ES"))
+                Text(
+                    text = format.format(product.precio),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(onClick = {
+                    // TODO: Add to cart logic
+                    Toast.makeText(context, "${product.nombre} added to cart", Toast.LENGTH_SHORT).show()
+                }) {
+                    Text("Add to Cart")
+                }
             }
         }
     }

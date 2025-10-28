@@ -15,7 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.airsoftrockgalacticapp.ui.theme.AirSoftRockGalacticAppTheme
+import com.example.airsoftrockgalacticapp.ui.theme.AirsoftRockGalacticAppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
             val themeDataStore = remember { ThemeDataStore(this) }
             val isDarkMode by themeDataStore.isDarkMode.collectAsState(initial = false)
 
-            AirSoftRockGalacticAppTheme(darkTheme = isDarkMode) {
+            AirsoftRockGalacticAppTheme(darkTheme = isDarkMode) {
                 AppNavigation(modifier = Modifier.fillMaxSize())
             }
         }
