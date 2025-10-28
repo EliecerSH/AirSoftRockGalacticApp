@@ -4,11 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -21,21 +22,37 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             val themeDataStore = remember { ThemeDataStore(this) }
             val isDarkMode by themeDataStore.isDarkMode.collectAsState(initial = false)
 
             AirSoftRockGalacticAppTheme(darkTheme = isDarkMode) {
-                AppNavigation(modifier = Modifier.fillMaxSize())
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    AppNavigation()
+                }
             }
         }
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun AppNavigation(modifier: Modifier = Modifier) {
+fun AppNavigation() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "login", modifier = modifier) {
+
+    // NavHost es el encargado de gestionar las animaciones entre pantallas.
+    // Se definen con enterTransition y exitTransition.
+    NavHost(
+        navController = navController,
+        startDestination = "login",
+        modifier = Modifier.fillMaxSize(),
+        enterTransition = { fadeIn(animationSpec = tween(300)) },
+        exitTransition = { fadeOut(animationSpec = tween(300)) }
+    ) {
         composable("login") {
             LoginScreen(navController = navController)
         }
@@ -43,7 +60,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             RegisterScreen(navController = navController)
         }
         composable(
-            "home/{email}", 
+            route = "home/{email}",
             arguments = listOf(navArgument("email") { type = NavType.StringType })
         ) { backStackEntry ->
             val email = backStackEntry.arguments?.getString("email")
