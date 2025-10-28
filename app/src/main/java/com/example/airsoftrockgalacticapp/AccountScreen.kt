@@ -8,12 +8,18 @@ import android.provider.BaseColumns
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,7 +35,14 @@ import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
 
-data class Payment(val id: Long, val totalAmount: Double, val date: String, val name: String, val address: String, val cardNumber: String)
+data class Payment(
+    val id: Long,
+    val totalAmount: Double,
+    val date: String,
+    val name: String,
+    val address: String,
+    val cardNumber: String
+)
 
 @SuppressLint("Range")
 @Composable
@@ -53,12 +66,17 @@ fun AccountScreen(email: String?) {
                 val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
                 context.contentResolver.takePersistableUriPermission(it, flag)
                 avatarUri = it
-                 if (email != null) {
+                if (email != null) {
                     val db = userDbHelper.writableDatabase
                     val values = ContentValues().apply {
                         put(UserContract.UserEntry.COLUMN_NAME_AVATAR_URI, it.toString())
                     }
-                    db.update(UserContract.UserEntry.TABLE_NAME, values, "${UserContract.UserEntry.COLUMN_NAME_EMAIL} = ?", arrayOf(email))
+                    db.update(
+                        UserContract.UserEntry.TABLE_NAME,
+                        values,
+                        "${UserContract.UserEntry.COLUMN_NAME_EMAIL} = ?",
+                        arrayOf(email)
+                    )
                 }
             }
         }
@@ -67,7 +85,19 @@ fun AccountScreen(email: String?) {
     LaunchedEffect(email) {
         if (email != null) {
             val userDb = userDbHelper.readableDatabase
-            val userCursor = userDb.query(UserContract.UserEntry.TABLE_NAME, arrayOf(UserContract.UserEntry.COLUMN_NAME_NAME, UserContract.UserEntry.COLUMN_NAME_ALIAS, UserContract.UserEntry.COLUMN_NAME_AVATAR_URI), "${UserContract.UserEntry.COLUMN_NAME_EMAIL} = ?", arrayOf(email), null, null, null)
+            val userCursor = userDb.query(
+                UserContract.UserEntry.TABLE_NAME,
+                arrayOf(
+                    UserContract.UserEntry.COLUMN_NAME_NAME,
+                    UserContract.UserEntry.COLUMN_NAME_ALIAS,
+                    UserContract.UserEntry.COLUMN_NAME_AVATAR_URI
+                ),
+                "${UserContract.UserEntry.COLUMN_NAME_EMAIL} = ?",
+                arrayOf(email),
+                null,
+                null,
+                null
+            )
             with(userCursor) {
                 if (moveToFirst()) {
                     name = getString(getColumnIndexOrThrow(UserContract.UserEntry.COLUMN_NAME_NAME))
@@ -81,7 +111,15 @@ fun AccountScreen(email: String?) {
             }
 
             val paymentDb = paymentDbHelper.readableDatabase
-            val paymentCursor = paymentDb.query(PaymentContract.PaymentEntry.TABLE_NAME, null, "${PaymentContract.PaymentEntry.COLUMN_NAME_USER_EMAIL} = ?", arrayOf(email), null, null, "${BaseColumns._ID} DESC")
+            val paymentCursor = paymentDb.query(
+                PaymentContract.PaymentEntry.TABLE_NAME,
+                null,
+                "${PaymentContract.PaymentEntry.COLUMN_NAME_USER_EMAIL} = ?",
+                arrayOf(email),
+                null,
+                null,
+                "${BaseColumns._ID} DESC"
+            )
             val paymentList = mutableListOf<Payment>()
             with(paymentCursor) {
                 while (moveToNext()) {
@@ -108,72 +146,160 @@ fun AccountScreen(email: String?) {
             val values = ContentValues().apply {
                 put(UserContract.UserEntry.COLUMN_NAME_ALIAS, alias)
             }
-            db.update(UserContract.UserEntry.TABLE_NAME, values, "${UserContract.UserEntry.COLUMN_NAME_EMAIL} = ?", arrayOf(email))
+            db.update(
+                UserContract.UserEntry.TABLE_NAME,
+                values,
+                "${UserContract.UserEntry.COLUMN_NAME_EMAIL} = ?",
+                arrayOf(email)
+            )
             Toast.makeText(context, "Alias actualizado", Toast.LENGTH_SHORT).show()
         }
     }
 
-    LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        // --- User Profile Section ---
-        item {
-            Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
-                Column(
-                    modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    if (avatarUri != null) {
-                        AsyncImage(model = avatarUri, contentDescription = "Avatar", modifier = Modifier.size(150.dp).clip(CircleShape).clickable { imagePickerLauncher.launch("image/*") }, contentScale = ContentScale.Crop)
-                    } else {
-                        Image(painter = painterResource(id = R.drawable.icon_01), contentDescription = "Avatar", modifier = Modifier.size(150.dp).clip(CircleShape).clickable { imagePickerLauncher.launch("image/*") }, contentScale = ContentScale.Crop)
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(name, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                    Text(email ?: "", style = MaterialTheme.typography.bodyLarge)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    OutlinedTextField(value = alias, onValueChange = { alias = it }, label = { Text("Alias") }, modifier = Modifier.fillMaxWidth())
-                    Button(onClick = { updateUserAlias() }, modifier = Modifier.padding(top = 8.dp)) {
-                        Text("Guardar Alias")
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(16.dp)
+    ) {
+        AnimatedVisibility(
+            visible = true,
+            enter = fadeIn(tween(700)),
+            exit = fadeOut()
+        ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // --- Profile Section ---
+                item {
+                    Card(
+                        shape = RoundedCornerShape(16.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(20.dp).fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .size(150.dp)
+                                    .clip(CircleShape)
+                                    .clickable { imagePickerLauncher.launch("image/*") }
+                            ) {
+                                if (avatarUri != null) {
+                                    AsyncImage(
+                                        model = avatarUri,
+                                        contentDescription = "Avatar",
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .clip(CircleShape)
+                                    )
+                                } else {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.icon_01),
+                                        contentDescription = "Avatar",
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .clip(CircleShape),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(name, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                            Text(email ?: "", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                            Spacer(modifier = Modifier.height(16.dp))
+                            OutlinedTextField(
+                                value = alias,
+                                onValueChange = { alias = it },
+                                label = { Text("Alias") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Button(
+                                onClick = { updateUserAlias() },
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                modifier = Modifier
+                                    .padding(top = 8.dp)
+                                    .fillMaxWidth()
+                            ) {
+                                Text("Guardar Alias", color = MaterialTheme.colorScheme.onPrimary)
+                            }
+                        }
                     }
                 }
-            }
-        }
 
-        // --- Theme Switcher ---
-        item {
-            Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
-                Row(
-                    modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("Modo Oscuro", style = MaterialTheme.typography.bodyLarge)
-                    Switch(
-                        checked = isDarkMode,
-                        onCheckedChange = { scope.launch { themeDataStore.setDarkMode(it) } }
+                // --- Theme Switcher ---
+                item {
+                    Card(
+                        shape = RoundedCornerShape(16.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(20.dp)
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text("Modo Oscuro", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+                            Switch(
+                                checked = isDarkMode,
+                                onCheckedChange = { scope.launch { themeDataStore.setDarkMode(it) } },
+                                colors = SwitchDefaults.colors(checkedThumbColor = MaterialTheme.colorScheme.primary)
+                            )
+                        }
+                    }
+                }
+
+                // --- Purchases Section ---
+                item {
+                    Text(
+                        "Historial de Compras",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.padding(start = 4.dp)
                     )
                 }
-            }
-        }
 
-        // --- Purchase History Section ---
-        item {
-            Text("Mis Compras", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(bottom = 8.dp))
-        }
-        if (payments.isEmpty()) {
-            item {
-                Text("No tienes compras registradas.")
-            }
-        } else {
-            items(payments) { payment ->
-                Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Compra #${payment.id}", style = MaterialTheme.typography.titleMedium)
-                        Text("Fecha: ${payment.date}")
-                        Text("Nombre: ${payment.name}")
-                        Text("Dirección: ${payment.address}")
-                        Text("Tarjeta: **** **** **** ${payment.cardNumber.takeLast(4)}")
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                            Text(NumberFormat.getCurrencyInstance(Locale("es", "CL")).format(payment.totalAmount), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                if (payments.isEmpty()) {
+                    item {
+                        Text("No tienes compras registradas.", color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f), modifier = Modifier.padding(start = 4.dp))
+                    }
+                } else {
+                    items(payments) { payment ->
+                        Card(
+                            shape = RoundedCornerShape(12.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text("Compra #${payment.id}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text("Fecha: ${payment.date}", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                                Text("Nombre: ${payment.name}", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                                Text("Dirección: ${payment.address}", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                                Text("Tarjeta: **** **** **** ${payment.cardNumber.takeLast(4)}", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.End
+                                ) {
+                                    Text(
+                                        NumberFormat.getCurrencyInstance(Locale("es", "CL")).format(payment.totalAmount),
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
                         }
                     }
                 }
