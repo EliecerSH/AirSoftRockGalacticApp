@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -32,6 +33,10 @@ fun LoginScreen(navController: NavController) {
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
     val dbHelper = UserDbHelper(context)
+    
+    val themeDataStore = remember { ThemeDataStore(context) }
+    val isDarkMode by themeDataStore.isDarkMode.collectAsState(initial = isSystemInDarkTheme())
+    val logo = if (isDarkMode) R.drawable.icon_02 else R.drawable.icon_01
 
     Box(
         modifier = Modifier
@@ -51,7 +56,7 @@ fun LoginScreen(navController: NavController) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.icon_01),
+                    painter = painterResource(id = logo),
                     contentDescription = "Logo",
                     modifier = Modifier.size(120.dp)
                 )
@@ -144,6 +149,10 @@ fun RegisterScreen(navController: NavController) {
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
     val dbHelper = UserDbHelper(context)
+    
+    val themeDataStore = remember { ThemeDataStore(context) }
+    val isDarkMode by themeDataStore.isDarkMode.collectAsState(initial = isSystemInDarkTheme())
+    val logo = if (isDarkMode) R.drawable.icon_02 else R.drawable.icon_01
 
     Box(
         modifier = Modifier
@@ -163,7 +172,7 @@ fun RegisterScreen(navController: NavController) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.icon_01),
+                    painter = painterResource(id = logo),
                     contentDescription = "Logo",
                     modifier = Modifier.size(120.dp)
                 )
