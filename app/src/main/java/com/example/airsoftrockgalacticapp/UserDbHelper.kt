@@ -33,8 +33,6 @@ class UserDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
         db.execSQL(SQL_CREATE_ENTRIES)
     }
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        // En una app real, aquí iría una migración de datos.
-        // Por ahora, eliminamos y creamos la tabla de nuevo para que los cambios se apliquen.
         db.execSQL(SQL_DELETE_ENTRIES)
         onCreate(db)
     }
