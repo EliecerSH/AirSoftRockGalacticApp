@@ -85,7 +85,7 @@ fun LoginScreen(navController: NavController) {
                         OutlinedTextField(
                             value = email,
                             onValueChange = { email = it },
-                            label = { Text("Email") },
+                            label = { Text("Correo") },
                             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -93,7 +93,7 @@ fun LoginScreen(navController: NavController) {
                         OutlinedTextField(
                             value = password,
                             onValueChange = { password = it },
-                            label = { Text("Password") },
+                            label = { Text("Contraseña") },
                             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                             visualTransformation = PasswordVisualTransformation(),
                             modifier = Modifier.fillMaxWidth()
@@ -115,19 +115,19 @@ fun LoginScreen(navController: NavController) {
                                     null
                                 )
                                 if (cursor.count > 0) {
-                                    Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Secion exitosa", Toast.LENGTH_SHORT).show()
                                     navController.navigate("home/$email") {
                                         popUpTo("login") { inclusive = true }
                                     }
                                 } else {
-                                    Toast.makeText(context, "Invalid Credentials", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Datos Invalidos", Toast.LENGTH_SHORT).show()
                                 }
                                 cursor.close()
                             },
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                         ) {
-                            Text("Login", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.SemiBold)
+                            Text("Iniciar seccion", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
@@ -180,7 +180,7 @@ fun RegisterScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Create Account",
+                    text = "Creacion de cuenta",
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp,
                     color = MaterialTheme.colorScheme.onBackground
@@ -201,7 +201,7 @@ fun RegisterScreen(navController: NavController) {
                         OutlinedTextField(
                             value = name,
                             onValueChange = { name = it },
-                            label = { Text("Name") },
+                            label = { Text("Nombre") },
                             leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -209,7 +209,7 @@ fun RegisterScreen(navController: NavController) {
                         OutlinedTextField(
                             value = email,
                             onValueChange = { email = it },
-                            label = { Text("Email") },
+                            label = { Text("Correo") },
                             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -217,7 +217,7 @@ fun RegisterScreen(navController: NavController) {
                         OutlinedTextField(
                             value = password,
                             onValueChange = { password = it },
-                            label = { Text("Password") },
+                            label = { Text("Contraseña") },
                             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                             visualTransformation = PasswordVisualTransformation(),
                             modifier = Modifier.fillMaxWidth()
@@ -233,10 +233,10 @@ fun RegisterScreen(navController: NavController) {
                                 }
                                 val newRowId = db?.insert(UserContract.UserEntry.TABLE_NAME, null, values)
                                 if (newRowId != -1L) {
-                                    Toast.makeText(context, "Registration Successful", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Registro exitoso", Toast.LENGTH_SHORT).show()
                                     navController.navigate("login")
                                 } else {
-                                    Toast.makeText(context, "Registration Failed", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Registro fallido", Toast.LENGTH_SHORT).show()
                                 }
                             },
                             modifier = Modifier.fillMaxWidth(),
