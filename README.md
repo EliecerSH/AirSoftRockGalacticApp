@@ -1,11 +1,9 @@
-# AirSoft Rock Galactic - App de E-Commerce
+# AirSoft Rock Galactic - App
 
 Bienvenido a la app de **AirSoft Rock Galactic**, una tienda de comercio electrónico para Android completamente funcional, construida con las últimas tecnologías de Jetpack Compose.
 
 Esta aplicación simula una tienda de equipamiento táctico y réplicas de airsoft, permitiendo a los usuarios registrarse, explorar productos, añadirlos al carrito, realizar compras y gestionar su perfil.
 
-![Captura de Pantalla](https://via.placeholder.com/800x450.png?text=Añade+una+captura+de+pantalla+de+tu+app)
-*(Nota: Reemplaza la URL de arriba con una captura de pantalla de tu aplicación)*
 
 ## ✨ Características Principales
 
@@ -50,7 +48,7 @@ Para ejecutar este proyecto en tu entorno local, sigue estos pasos:
 
 1.  **Clona el repositorio**:
     ```sh
-    git clone https://github.com/tu-usuario/AirSoftRockGalacticApp.git
+    https://github.com/EliecerSH/AirSoftRockGalacticApp.git
     ```
 2.  **Abre el proyecto** en Android Studio.
 3.  **Sincroniza Gradle**: Espera a que Android Studio descargue y sincronice todas las dependencias del proyecto.
