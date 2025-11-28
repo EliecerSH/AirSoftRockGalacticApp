@@ -1,6 +1,10 @@
 package com.example.airsoftrockgalacticapp.screen
 
 import android.content.ContentValues
+import android.content.Context
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -125,6 +129,14 @@ fun LoginScreen(navController: NavController) {
                                     }
                                 } else {
                                     Toast.makeText(context, "Datos Invalidos", Toast.LENGTH_SHORT).show()
+                                    // Vibrate on login failure
+                                    val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                        vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
+                                    } else {
+                                        @Suppress("DEPRECATION")
+                                        vibrator.vibrate(200)
+                                    }
                                 }
                                 cursor.close()
                             },

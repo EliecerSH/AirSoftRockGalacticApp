@@ -19,25 +19,25 @@ import androidx.core.view.WindowCompat
 // Paleta de colores para el modo oscuro
 private val DarkColorScheme = darkColorScheme(
     primary = Color(0xFF4ADE80), // Verde táctico
-    secondary = Color(0xFF64748B), // Gris azulado
-    background = Color(0xFF1E293B), // Fondo oscuro (slate)
-    surface = Color(0xFF334155), // Superficie de las tarjetas
+    secondary = Color(0xFF78787C), // Gris azulado
+    background = Color(0xE428282C), // Fondo oscuro (slate)
+    surface = Color(0xFF3C3F4D), // Superficie de las tarjetas
     onPrimary = Color.Black,
     onSecondary = Color.White,
-    onBackground = Color(0xFFE2E8F0), // Texto claro
-    onSurface = Color(0xFFE2E8F0) // Texto claro en tarjetas
+    onBackground = Color(0xFFFFFFFF), // Texto claro
+    onSurface = Color(0xFFFFFFFF) // Texto claro en tarjetas
 )
 
 // Paleta de colores para el modo claro
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF4ADE80),
-    secondary = Color(0xFFF5F5F5),
-    background = Color(0xFFF8FAFC), // Fondo muy claro (casi blanco)
+    primary = Color(0xFF3CDA4C),
+    secondary = Color(0xFFFFFFFF),
+    background = Color(0xFFF8F8F8), // Fondo muy claro (casi blanco)
     surface = Color.White, // Superficie de las tarjetas
     onPrimary = Color.White,
     onSecondary = Color.Black,
-    onBackground = Color(0xFF0F172A), // Texto oscuro
-    onSurface = Color(0xFF0F172A) // Texto oscuro en tarjetas
+    onBackground = Color(0xFF0D0F15), // Texto oscuro
+    onSurface = Color(0xFF19191F) // Texto oscuro en tarjetas
 )
 
 @Composable
