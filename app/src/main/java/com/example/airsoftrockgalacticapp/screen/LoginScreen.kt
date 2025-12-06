@@ -151,7 +151,7 @@ fun LoginScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(12.dp))
 
                 TextButton(onClick = { navController.navigate("register") }) {
-                    Text("Aun no tienes una cuante? Registrate", color = MaterialTheme.colorScheme.primary)
+                    Text("Aun no tienes una cuenta? Registrate", color = MaterialTheme.colorScheme.primary)
                 }
             }
         }
