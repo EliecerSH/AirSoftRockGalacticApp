@@ -18,7 +18,7 @@ import androidx.core.view.WindowCompat
 
 // Paleta de colores para el modo oscuro
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFF4ADE80), // Verde táctico
+    primary = Color(0xFF45B936), // Verde táctico
     secondary = Color(0xFF78787C), // Gris azulado
     background = Color(0xE428282C), // Fondo oscuro (slate)
     surface = Color(0xFF3C3F4D), // Superficie de las tarjetas
@@ -30,8 +30,8 @@ private val DarkColorScheme = darkColorScheme(
 
 // Paleta de colores para el modo claro
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF3CDA4C),
-    secondary = Color(0xFFFFFFFF),
+    primary = Color(0xFF20441C),
+    secondary = Color(0xFFF3F3F3),
     background = Color(0xFFF8F8F8), // Fondo muy claro (casi blanco)
     surface = Color.White, // Superficie de las tarjetas
     onPrimary = Color.White,
